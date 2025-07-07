@@ -1,0 +1,24 @@
+{
+  "dataset1_params": {
+    "colsample_bytree": 0.8,
+    "learning_rate": 0.01,
+    "max_depth": 3,
+    "min_child_weight": 1,
+    "n_estimators": 100,
+    "reg_alpha": 0,
+    "reg_lambda": 1,
+    "shiftnum": 2,
+    "subsample": 0.8
+  },
+  "dataset2_params": {
+    "colsample_bytree": 0.7,
+    "learning_rate": 0.05,
+    "max_depth": 4,
+    "min_child_weight": 1,
+    "n_estimators": 200,
+    "reg_alpha": 0,
+    "reg_lambda": 1,
+    "shiftnum": 3,
+    "subsample": 0.7
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "dataset1_params": {
+    "activation": "relu",
+    "alpha": 0.0001,
+    "hidden_layer_sizes": [
+      50
+    ],
+    "learning_rate_init": 0.001,
+    "max_iter": 500,
+    "shiftnum": 2,
+    "solver": "adam"
+  },
+  "dataset2_params": {
+    "activation": "relu",
+    "alpha": 0.001,
+    "hidden_layer_sizes": [
+      100
+    ],
+    "learning_rate_init": 0.001,
+    "max_iter": 900,
+    "shiftnum": 3,
+    "solver": "adam"
+  },
+  "extra_params": {
+    "activation": "relu",
+    "alpha": 0.001,
+    "hidden_layer_sizes": [
+      100
+    ],
+    "learning_rate_init": 0.001,
+    "max_iter": 900,
+    "shiftnum": 3,
+    "solver": "adam"
+  }
+}
