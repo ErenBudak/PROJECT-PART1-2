@@ -1,4 +1,4 @@
-# PROJECT-PART1-2
+# PROJECT-PART1
 Projede model kaydetme ve birkaç küçük noktada daha yapay zeka ve diğer kaynaklardan yardım aldım,yardım aldığım yerleri belirttim
 Projede yaptıklarım:
 1-MLProject.ipynb:Burada MLP,XGBoost ve Random Forest için gerekli Classlar yer alıyor.Temel preprocess tekniğimi bozmadım,sadece Xgboost ve MLP için gerekli yerlere eklemeler yaptım.
