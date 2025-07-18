@@ -1,8 +1,8 @@
 # PROJECT-PART1
-Projede model kaydetme ve birkaç küçük noktada daha yapay zeka ve diğer kaynaklardan yardım aldım,yardım aldığım yerleri belirttim,NOT:Kayıtlı modeller pickle şeklinde kaydedildi,buradan load edilebilir.
+Projede model kaydetme ve birkaç küçük noktada daha yapay zeka ve diğer kaynaklardan yardım aldım,yardım aldığım yerleri belirttim,NOT:Kayıtlı modeller pickle şeklinde kaydedildi,buradan load edilebilir.Feedback doğrultusunda konum ve eşiğe göre ölçüm eklendi.ÖNEMLİ NOT:Konum ve Eşik değerlendirmesi gelismisdeneme.ipynb de MLP ye eklendiği için MLPTESTS.ipynb ye eklemedim.
 Projede yaptıklarım:
 models klasörü:9 model de pkl dosyası şeklinde kaydedildi.
-MLPProvider.ipynb:En iyi model,RobustScaler+Outlier Detection ile iyileşti
+gelismisdeneme.ipynb:En iyi model,RobustScaler+Outlier Detection ile iyileşti
 MLProject.ipynb:Burada MLP,XGBoost ve Random Forest için gerekli Classlar yer alıyor.Temel preprocess tekniğimi bozmadım,sadece Xgboost ve MLP için gerekli yerlere eklemeler yaptım.
 RandomForestTests.ipynb:RandomForest için dataset 1 ve 2 yi eğittim ve test ettim,MSE MAE VE R2 metrikleriyle sonuçlar elde ettim,ek bir model dahil.
 XgBoostTests.ipynb:XgBoost için aynı şeyleri yaptım,çalışması çok uzun sürdüğünden ve benzer sorunlara benzer tepkiler vereceğinden ötürü ek versiyon koymadım.
