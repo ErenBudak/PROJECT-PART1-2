@@ -1,0 +1,13 @@
+{
+  "best_params": {
+    "sequence_length": 19,
+    "lstm_units": 256,
+    "lstm_layers": 2,
+    "dropout_rate": 0.30012324171230487,
+    "dense_dim": 128,
+    "learning_rate": 0.001827900125554867,
+    "batch_size": 64,
+    "optimizer": "rmsprop",
+    "activation": "tanh"
+  }
+}
