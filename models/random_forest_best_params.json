@@ -2,15 +2,22 @@
   "dataset1_params": {
     "max_depth": 4,
     "max_features": 3,
+    "min_samples_split": 20,
+    "n_estimators": 250,
+    "shiftnum": 6
+  },
+  "dataset2_params": {
+    "max_depth": 9,
+    "max_features": 8,
     "min_samples_split": 10,
-    "n_estimators": 50,
-    "shiftnum": 2
+    "n_estimators": 100,
+    "shiftnum": 4
   },
   "extra_params": {
-    "max_depth": 3,
-    "max_features": 4,
-    "min_samples_split": 15,
-    "n_estimators": 50,
+    "max_depth": 13,
+    "max_features": 6,
+    "min_samples_split": 32,
+    "n_estimators": 80,
     "shiftnum": 2
   }
 }
