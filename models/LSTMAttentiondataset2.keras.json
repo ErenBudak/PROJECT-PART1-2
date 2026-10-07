@@ -1,0 +1,13 @@
+{
+  "best_params": {
+    "sequence_length": 16,
+    "lstm_units": 256,
+    "lstm_layers": 3,
+    "dropout_rate": 0.21163982588318786,
+    "dense_dim": 16,
+    "learning_rate": 0.000316038032592918,
+    "batch_size": 64,
+    "optimizer": "adam",
+    "activation": "relu"
+  }
+}

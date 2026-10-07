@@ -1,12 +1,12 @@
 {
   "best_params": {
     "sequence_length": 15,
-    "lstm_units": 128,
-    "lstm_layers": 3,
-    "dropout_rate": 0.20351199264000677,
+    "lstm_units": 256,
+    "lstm_layers": 2,
+    "dropout_rate": 0.422976062065625,
     "dense_dim": 16,
-    "learning_rate": 0.00023426581058204064,
-    "batch_size": 16,
+    "learning_rate": 0.0007148510793512986,
+    "batch_size": 32,
     "optimizer": "adam",
     "activation": "relu"
   }
