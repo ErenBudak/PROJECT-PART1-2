@@ -56,6 +56,44 @@ def ml_scorer(estimator, X, y=None):
     return -normalized_mse(y_true, y_pred, estimator.target_scale_)
 
 
+class ChunkedSearchResult:
+    """GridSearchCV'nin kullandığımız alanlarını taşır: best_params_, best_score_, best_estimator_."""
+
+    def __init__(self, best_params, best_score, best_estimator, n_candidates):
+        self.best_params_ = best_params
+        self.best_score_ = best_score
+        self.best_estimator_ = best_estimator
+        self.n_candidates_ = n_candidates
+
+
+def chunked_grid_search(estimator, param_grid, cv, train, chunk_size=250, n_jobs=-1, verbose=1):
+    """Büyük bir grid'i parçalara bölerek arar; sonuç tek seferlik GridSearchCV ile aynıdır.
+
+    Tek bir GridSearchCV'de görevleri işçilere dağıtan ana işlem, aday sayısı büyüdükçe orantısız
+    yavaşlıyor: 9 bin görev dakikalar sürerken XGBoost'un 79 bin görevi saatlerce bitmiyor, işçiler
+    boşta bekliyordu. Aynı adaylar, aynı CV katmanları ve aynı scorer ile parça parça aranıyor;
+    en yüksek ortalama CV skoru (eşitlikte ilk gelen) seçilip model tüm train ile yeniden eğitiliyor.
+    """
+    from sklearn.base import clone
+    from sklearn.model_selection import GridSearchCV, ParameterGrid
+
+    candidates = list(ParameterGrid(param_grid))
+    best_score, best_params = -np.inf, None
+    for start in range(0, len(candidates), chunk_size):
+        chunk = [{k: [v] for k, v in params.items()} for params in candidates[start:start + chunk_size]]
+        search = GridSearchCV(estimator, chunk, cv=cv, scoring=ml_scorer, error_score='raise',
+                              n_jobs=n_jobs, refit=False).fit(train)
+        scores = search.cv_results_['mean_test_score']
+        i = int(np.argmax(scores))
+        if scores[i] > best_score:
+            best_score, best_params = float(scores[i]), search.cv_results_['params'][i]
+        done = min(start + chunk_size, len(candidates))
+        if verbose and (done == len(candidates) or (start // chunk_size) % 10 == 9):
+            print(f"{done}/{len(candidates)} aday denendi, şu ana kadarki en iyi CV skoru: {best_score:.3f}")
+    best_estimator = clone(estimator).set_params(**best_params).fit(train)
+    return ChunkedSearchResult(best_params, best_score, best_estimator, len(candidates))
+
+
 def predict_aligned(model, df, context_df=None):
     """Tahminleri doğru satırlarla eşleşmiş bir DataFrame olarak döndürür.
 
