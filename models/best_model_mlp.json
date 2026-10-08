@@ -3,11 +3,17 @@
     "activation": "relu",
     "alpha": 0.0001,
     "hidden_layer_sizes": [
+      100,
       50
     ],
-    "learning_rate_init": 0.001,
+    "learning_rate_init": 0.1,
     "max_iter": 500,
     "shiftnum": 2,
     "solver": "adam"
+  },
+  "evaluation_info": {
+    "time_prediction_window": "1_day",
+    "threshold_evaluation": "added",
+    "location_based_evaluation": "added"
   }
 }
