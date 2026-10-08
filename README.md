@@ -15,6 +15,7 @@ significant_earthquake_dataset_1900_2023.csv:Dataset 2,yıllık timesteplerle ku
 evaluation.py:Tüm modeller için ortak değerlendirme fonksiyonları (hizalı metrikler, train/test karşılaştırması, referans modeller, eşik ve konum analizi).
 results klasörü:Her modelin train/test/referans metrikleri JSON olarak.
 BolgeselRF.ipynb + regional.py:Bölge bazlı Random Forest. Dünya ızgara hücrelerine bölünür, her hücre için bir sonraki dönemin en büyük depremi tahmin edilir (veri azlığı ve ortalama alma sorunlarına karşı).
+OlayBazliRF.ipynb:Olay bazlı Random Forest. Gruplama/ortalama yok; önceki 5 depremin ham değerlerinden bir sonraki depremin büyüklüğü tahmin edilir (küresel sıra ve aynı hücredeki sıra).
 
 
 
