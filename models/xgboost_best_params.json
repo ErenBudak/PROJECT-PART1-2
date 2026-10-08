@@ -2,23 +2,23 @@
   "dataset1_params": {
     "colsample_bytree": 0.8,
     "learning_rate": 0.01,
-    "max_depth": 3,
+    "max_depth": 5,
     "min_child_weight": 1,
     "n_estimators": 100,
-    "reg_alpha": 0,
-    "reg_lambda": 1,
+    "reg_alpha": 0.5,
+    "reg_lambda": 2,
     "shiftnum": 2,
     "subsample": 0.8
   },
   "dataset2_params": {
-    "colsample_bytree": 0.7,
-    "learning_rate": 0.05,
+    "colsample_bytree": 0.9,
+    "learning_rate": 0.15,
     "max_depth": 4,
-    "min_child_weight": 1,
-    "n_estimators": 200,
-    "reg_alpha": 0,
+    "min_child_weight": 3,
+    "n_estimators": 400,
+    "reg_alpha": 0.3,
     "reg_lambda": 1,
-    "shiftnum": 3,
+    "shiftnum": 5,
     "subsample": 0.7
   }
 }

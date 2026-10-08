@@ -14,6 +14,7 @@ usgs_main.csv:Dataset 1.Genel olarak haftalık timesteplerle kullanıldı
 significant_earthquake_dataset_1900_2023.csv:Dataset 2,yıllık timesteplerle kullanıldı,ek versiyonlarda hafta olarak da denendi.
 evaluation.py:Tüm modeller için ortak değerlendirme fonksiyonları (hizalı metrikler, train/test karşılaştırması, referans modeller, eşik ve konum analizi).
 results klasörü:Her modelin train/test/referans metrikleri JSON olarak.
+RAPOR.md:Yapılan düzeltmelerin sebepleriyle anlatımı ve yeniden eğitilen tüm modellerin train/test sonuçları.
 
 ## Düzeltmeler (fix/evaluation-and-tuning branch'i)
 
