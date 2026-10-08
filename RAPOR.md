@@ -5,8 +5,9 @@ Bu rapor `fix/evaluation-and-tuning` branch'inde yapılan değişiklikleri, her 
 ## Kısa özet
 
 - Kodda, sonuçları geçersiz kılan **8 hata** bulundu ve düzeltildi. En önemlileri: hiperparametre araması hiç çalışmıyordu, aranan parametreler modele ulaşmıyordu ve tahminler yanlış satırlarla karşılaştırılıyordu.
-- Problem tanımı ve veri hazırlığı **değiştirilmedi**: aynı veri setleri, aynı haftalık/yıllık/günlük ortalamalar, aynı 4 hedef, aynı hiperparametre grid'leri.
+- 1. ve 2. bölümde problem tanımı ve veri hazırlığı **değiştirilmedi**: aynı veri setleri, aynı haftalık/yıllık/günlük ortalamalar, aynı 4 hedef, aynı hiperparametre grid'leri.
 - Bütün modeller düzeltilmiş kodla yeniden eğitildi. Sonuçlar bu raporun 2. bölümünde.
+- Ardından problem bölge bazında yeniden tanımlandı ve Random Forest bu kurulumda Dataset 1'de test R² 0.82 verdi. Eski ve yeni hedefin farkı ile sonuçlar 3. bölümde.
 - Düzeltmelerin amacı modelleri daha başarılı göstermek değil, sonuçları **doğru ve savunulabilir** hale getirmekti.
 
 ---
@@ -437,3 +438,106 @@ Büyüklük eşiği: 6.478  |  test: 24 örnek, gerçek pozitif: 0, tahmin pozit
   Testte tek sınıf var; bu eşikte sınıflandırma metrikleri anlamsız.
 ```
 
+---
+
+## 3. Problemin yeniden tanımlanması: eski versiyon ne tahmin ediyordu, 0.82 veren versiyon ne tahmin ediyor
+
+1\. ve 2. bölümdeki düzeltmeler kodu doğru hale getirdi ama modeller yine bir şey öğrenemedi. Sebep kodda değil, tahmin edilmeye çalışılan şeydeydi. Bu bölüm, eski hedef ile `BolgeselRF.ipynb` içindeki yeni hedefin farkını anlatır.
+
+### 3.1 Eski versiyon: "Gelecek hafta dünyadaki tüm depremlerin ortalaması ne olacak?"
+
+Bir haftada dünyanın her yerinde kaydedilen ~1.800 depremin tamamı tek bir satıra indiriliyordu:
+
+| Hafta | Ortalama büyüklük | Ortalama derinlik | Ortalama enlem | Ortalama boylam |
+|---|---|---|---|---|
+| 1 | 1.60 | 19.7 km | 37.4° | −114.9° |
+| 2 | 1.68 | 22.7 km | 37.8° | −113.0° |
+| 3 | ? | ? | ? | ? |
+
+Model 1. ve 2. haftaya bakıp 3. haftanın bu dört ortalamasını tahmin ediyordu.
+
+- **Girdi:** önceki haftaların dünya ortalamaları
+- **Çıktı:** gelecek haftanın dünya ortalaması (4 sayı)
+- **Veri:** 42 satır
+
+Sorunu: bu sayılar bir olaya karşılık gelmiyor.
+
+- **Ortalama büyüklük neredeyse sabit.** Kayıtların büyük çoğunluğu 1–2 büyüklüğünde küçük sarsıntılar. 1.799 küçük depremin ortalaması 1.65 ise, o hafta 7.0 büyüklüğünde bir deprem de olsa ortalama 1.653 olur. Yılın en önemli olayı ortalamayı binde 3 oynatır. Haftalık ortalamalar hep 1.6–1.7 bandında kalır; aradaki küçük oynama bir örüntüden değil, o hafta hangi bölgede kaç küçük deprem kaydedildiğinden gelir.
+- **Ortalama konum gerçek bir yer değil.** USGS verisi küresel. Aynı hafta Kaliforniya'da (boylam −120) ve Japonya'da (boylam +140) deprem olursa ortalama boylam +10 çıkar; orada deprem olmamıştır.
+
+Model en iyi ihtimalle "hep ortalamayı söyle" stratejisini öğrenebilir. 2. bölümdeki sonuçlar tam olarak bunu gösteriyor: train R² ≈ 0, test R² negatif.
+
+### 3.2 Yeni versiyon: "Gelecek hafta bu bölgedeki en büyük deprem kaç olacak?"
+
+Dünya 1°×1° karelere bölünüyor (yaklaşık 100 km × 100 km) ve her kare ayrı ayrı takip ediliyor. Aşağıdaki sayılar yapıyı göstermek için örnektir:
+
+| Bölge | Hafta | Deprem sayısı | En büyük deprem | … | **Gelecek hafta en büyük** |
+|---|---|---|---|---|---|
+| Kaliforniya'da bir kare (36.5°, −117.5°) | 5 | 48 | 2.9 | … | **3.1** |
+| Aynı kare | 6 | 52 | 3.1 | … | **2.7** |
+| Japonya açıklarında bir kare (38.5°, 142.5°) | 5 | 2 | 4.8 | … | **5.1** |
+
+- **Girdi:** o karenin son haftalardaki deprem sayısı, en büyük ve ortalama büyüklüğü, derinliği, geçmiş profili, komşu karelerin durumu, koordinatı
+- **Çıktı:** o karede gelecek haftanın en büyük depreminin büyüklüğü (1 sayı)
+- **Veri:** 8.044 satır (1.164 kare)
+
+Hedef, bir sonraki haftada o karede en az bir deprem kaydı olan satırlar için tanımlıdır.
+
+### 3.3 Yan yana
+
+| | Eski | Yeni (bölgesel) |
+|---|---|---|
+| Soru | Dünya ortalaması ne olacak? | Bu bölgenin en büyük depremi kaç olacak? |
+| Bakılan yer | Tüm dünya, tek satırda | Her bölge ayrı |
+| Hedefin türü | Ortalama | En büyük değer |
+| Hedef sayısı | 4 (büyüklük, derinlik, enlem, boylam) | 1 (büyüklük) |
+| Hedefin aralığı | ~1.6 – 1.7 | ~0.5 – 7 |
+| Satır sayısı (Dataset 1) | 42 | 8.044 |
+| Random Forest test R² (Dataset 1) | −2.13 | 0.82 |
+
+### 3.4 Bölgesel Random Forest sonuçları
+
+Kronolojik bölme: ilk %80 dönem train, son %20 test. Referanslar: persistence (gelecek = şimdiki), hücre ortalaması (her karenin train'deki ortalaması), global ortalama.
+
+**Dataset 1 (USGS 2022, 1°×1° kare × hafta): 1.164 kare, train 6.160, test 1.884 satır**
+
+| Model | Veri | R² | MAE | MSE | RMSE |
+|---|---|---|---|---|---|
+| Random Forest | Train | 0.834 | 0.398 | 0.309 | 0.556 |
+| Random Forest | Test | 0.817 | 0.427 | 0.355 | 0.596 |
+| Persistence (referans) | Test | 0.694 | 0.563 | 0.594 | 0.771 |
+| Hücre ortalaması (referans) | Test | 0.632 | 0.583 | 0.714 | 0.845 |
+| Global ortalama (referans) | Test | −0.041 | 1.192 | 2.023 | 1.422 |
+
+Test, eşik bazlı sınıflandırma (eşikler train hedef dağılımının %75 ve %90'lık dilimleri):
+
+| Model | Eşik | Accuracy | Precision | Recall | F1 | AUC |
+|---|---|---|---|---|---|---|
+| Random Forest | ≥3.98 | 0.971 | 0.991 | 0.921 | 0.955 | 0.988 |
+| Random Forest | ≥4.70 | 0.879 | 0.619 | 0.528 | 0.570 | 0.924 |
+| Persistence | ≥3.98 | 0.956 | 0.932 | 0.934 | 0.933 | 0.976 |
+| Persistence | ≥4.70 | 0.855 | 0.521 | 0.524 | 0.523 | 0.902 |
+
+**Dataset 2 (M≥5.5, 10°×10° kare × yıl, 1973 sonrası): 161 kare, train 3.232, test 905 satır**
+
+| Model | Veri | R² | MAE | MSE | RMSE |
+|---|---|---|---|---|---|
+| Random Forest | Train | 0.443 | 0.329 | 0.185 | 0.430 |
+| Random Forest | Test | 0.252 | 0.381 | 0.249 | 0.499 |
+| Hücre ortalaması (referans) | Test | 0.236 | 0.377 | 0.254 | 0.504 |
+| Global ortalama (referans) | Test | −0.002 | 0.460 | 0.334 | 0.578 |
+| Persistence (referans) | Test | −0.403 | 0.501 | 0.467 | 0.684 |
+
+Dataset 2'de sonuç sınırlı: o katalog yalnızca M≥5.5 depremleri içerdiği için bir karede yılın en büyük depremi dar bir aralıkta oynuyor ve model hücre ortalaması referansını çok az geçiyor.
+
+Tam tablolar (train tarafındaki sınıflandırma metrikleri dahil) `BolgeselRF.ipynb` çıktısında ve `results/bolgesel_rf_dataset1.json`, `results/bolgesel_rf_dataset2.json` dosyalarında.
+
+### 3.5 0.82 neyi başarıyor, neyi başarmıyor
+
+**Başardığı:** Bir bölge için "gelecek hafta burada en büyük deprem yaklaşık şu büyüklükte olur" tahminini ortalama 0.43 büyüklük birimi hatayla veriyor; train ve test skorları neredeyse aynı (ezber yok) ve üç referansı da geçiyor.
+
+**Bunu nasıl yapıyor:** Büyük ölçüde her bölgenin kendi karakterini öğrenerek. Yoğun sismograf ağıyla izlenen bir karede küçük depremler de kaydediliyor ve haftanın en büyüğü genelde 2–3 oluyor. Okyanus ortasındaki bir karede sadece büyük depremler kaydedilebiliyor ve en büyük değer genelde 4–5. Model bu farkı ve bölgenin son haftalardaki hareketliliğini kullanıyor. En önemli özellikler de bunu gösteriyor: karenin geçmiş ortalama en büyük depremi, son 8 haftanın ortalaması ve komşu kareler.
+
+**Başarmadığı:** "Şu tarihte şurada 7 büyüklüğünde deprem olacak" türünden bir öngörü. Bir bölgenin alışılmış seviyesinin çok üstündeki nadir büyük depremleri önceden yakalayamıyor (≥4.70 eşiğinde recall 0.53). Bu, deprem biliminin açık problemi.
+
+**Özet:** Eski versiyon anlamı olmayan bir sayıyı tahmin etmeye çalışıyordu. Yeni versiyon gerçek bir soruyu cevaplıyor ve cevabı esas olarak "her bölgenin tipik deprem seviyesi" bilgisine dayanıyor.
